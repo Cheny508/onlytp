@@ -101,9 +101,7 @@ public class OTPCommand {
                                                                                     DoubleArgumentType.getDouble(ctx,"y"),
                                                                                     DoubleArgumentType.getDouble(ctx,"z"),
 
-                                                                                    ResourceLocationArgument
-                                                                                            .getId(ctx,"dimension")
-                                                                                            .toString()
+                                                                                    null
                                                                             );
 
 
@@ -195,48 +193,45 @@ public class OTPCommand {
 
 
 
-            ServerLevel level;
+            ServerLevel targetLevel;
 
 
+// 没输入维度，使用玩家当前维度
+            if(dimension == null){
 
-            // 当前维度
-            if(dimension==null){
 
-
-                level =
-                        player.serverLevel();
+                targetLevel = player.serverLevel();
 
 
             }
 
-            else{
+            else {
+
+
+                ResourceLocation location =
+                        new ResourceLocation(dimension);
 
 
                 ResourceKey<Level> key =
                         ResourceKey.create(
                                 Registries.DIMENSION,
-                                ResourceLocation.parse(dimension)
+                                location
                         );
 
 
-
-                level =
+                targetLevel =
                         player.server.getLevel(key);
 
 
 
-                if(level==null){
-
+                if(targetLevel == null){
 
                     source.sendFailure(
-
                             Component.literal(
                                     "Dimension not found: "
-                                            +dimension
+                                            + dimension
                             )
-
                     );
-
 
                     return 0;
 
@@ -248,39 +243,29 @@ public class OTPCommand {
 
 
 
-            if(level != player.serverLevel()){
+            if(player.serverLevel() != targetLevel){
 
 
                 player.teleportTo(
-
-                        level,
-
+                        targetLevel,
                         x,
-
                         y,
-
                         z,
-
                         player.getYRot(),
-
                         player.getXRot()
-
                 );
 
 
             }
-
             else{
 
 
-                player.teleportTo(
-
+                player.connection.teleport(
                         x,
-
                         y,
-
-                        z
-
+                        z,
+                        player.getYRot(),
+                        player.getXRot()
                 );
 
 
